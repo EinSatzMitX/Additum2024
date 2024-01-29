@@ -20,3 +20,7 @@ Vorgehen & Funktionsweise
 ----
 Da ich das komplette Vorgehen auf keinen Fall unter 30 Seiten protokollieren kann, werde ich hier die gröbsten Vorgehensweisen für mein Projekt auflisten.
 Nachdem die Benötigte
+
+
+Hilfreiche Ressourcen:
+[Github](https://github.com/babbleberry/rpi4-osdev)
