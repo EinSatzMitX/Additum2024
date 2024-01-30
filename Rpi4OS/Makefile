@@ -1,4 +1,4 @@
-RPI_VERSION ?= 4
+BOOTMNT ?= /media/parallels/boot
 
 ARMGNU ?= aarch64-linux-gnu
 
@@ -14,6 +14,7 @@ all : kernel8.img
 
 clean :
 	rm -rf $(BUILD_DIR) *.img 
+	/bin/rm kernel8.elf *.o *.img > /dev/null 2> /dev/null || true
 
 $(BUILD_DIR)/%_c.o: $(SRC_DIR)/%.c
 	mkdir -p $(@D)

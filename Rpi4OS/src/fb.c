@@ -140,32 +140,74 @@ void drawCircle(int x0, int y0, int radius, unsigned char attr, int fill)
     }
 }
 
-void drawChar(unsigned char ch, int x, int y, unsigned char attr)
+void drawChar(unsigned char ch, int x, int y, unsigned char attr, int zoom)
 {
     unsigned char *glyph = (unsigned char *)&font + (ch < FONT_NUMGLYPHS ? ch : 0) * FONT_BPG;
 
-    for (int i=0;i<FONT_HEIGHT;i++) {
-	for (int j=0;j<FONT_WIDTH;j++) {
-	    unsigned char mask = 1 << j;
+    for (int i=1;i<=(FONT_HEIGHT*zoom);i++) {
+	for (int j=0;j<(FONT_WIDTH*zoom);j++) {
+	    unsigned char mask = 1 << (j/zoom);
 	    unsigned char col = (*glyph & mask) ? attr & 0x0f : (attr & 0xf0) >> 4;
 
 	    drawPixel(x+j, y+i, col);
 	}
-	glyph += FONT_BPL;
+	glyph += (i%zoom) ? 0 : FONT_BPL;
     }
 }
 
-void drawString(int x, int y, char *s, unsigned char attr)
+void drawString(int x, int y, char *s, unsigned char attr, int zoom)
 {
     while (*s) {
        if (*s == '\r') {
           x = 0;
        } else if(*s == '\n') {
-          x = 0; y += FONT_HEIGHT;
+          x = 0; y += (FONT_HEIGHT*zoom);
        } else {
-	  drawChar(*s, x, y, attr);
-          x += FONT_WIDTH;
+	  drawChar(*s, x, y, attr, zoom);
+          x += (FONT_WIDTH*zoom);
        }
        s++;
     }
+}
+
+void moveRect(int oldx, int oldy, int width, int height, int shiftx, int shifty, unsigned char attr)
+{
+    unsigned int newx = oldx + shiftx, newy = oldy + shifty;
+    unsigned int xcount = 0, ycount = 0;
+    unsigned int bitmap[width][height]; // This is very unsafe if it's too big for the stack...
+    unsigned int offs;
+
+    // Save the bitmap
+    while (xcount < width) {
+       while (ycount < height) {
+          offs = ((oldy + ycount) * pitch) + ((oldx + xcount) * 4);
+
+	  bitmap[xcount][ycount] = *((unsigned int*)(fb + offs));
+	  ycount++;
+       }
+       ycount=0;
+       xcount++;
+    }
+    // Wipe it out with background colour
+    drawRect(oldx, oldy, oldx + width, oldy + width, attr, 1);
+    // Draw it again
+    for (int i=newx;i<newx + width;i++) {
+        for (int j=newy;j<newy + height;j++) {
+            offs = (j * pitch) + (i * 4);
+	    *((unsigned int*)(fb + offs)) = bitmap[i-newx][j-newy];
+        }
+    }
+}
+
+void wait_msec(unsigned int n)
+{
+    register unsigned long f, t, r;
+
+    // Get the current counter frequency
+    asm volatile ("mrs %0, cntfrq_el0" : "=r"(f));
+    // Read the current counter
+    asm volatile ("mrs %0, cntpct_el0" : "=r"(t));
+    // Calculate expire value for counter
+    t+=((f/1000)*n)/1000;
+    do{asm volatile ("mrs %0, cntpct_el0" : "=r"(r));}while(r<t);
 }
