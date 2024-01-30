@@ -83,6 +83,9 @@ make clean
 
 Bin ich jetzt endlich fertig? - Ja, fast. Nun muss man nur noch die .img-Datei auf die SD-Karte spielen, den Raspberry Pi über die verschiedenen Pins verbinden, Strom anlegen und es funktioniert! In dem PuTTY-Fenster auf der Dev-Machine kann man nun Dinge in die Konsole eingeben! 
 
+![cabled RPi](/Rpi4OS/documenttion/cabled-pins.jpg)
+
+
 
 
 Hilfreiche Ressourcen:
