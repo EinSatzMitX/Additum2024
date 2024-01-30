@@ -32,7 +32,7 @@ Der Kernel ist praktisch das Herzstück eines jeden OS‘ .  Auf ihm basiert das
 Zu Beginn meines Projekts habe ich lediglich einen Kernel in [C](https://en.wikipedia.org/wiki/C_(programming_language)) geschrieben, der darauf wartet, dass der User eine Taste drückt und dann den entsprechenden Buchstaben wiedergibt.
 Diesen C-Code kann ich allerdings nicht einfach auf meine SD-Karte laden und hoffen, dass alles klappt, das wäre ja viel zu einfach. Zu erst muss dieser Code in eine .img-Datei kompiliert werden, d.h. er muss von einem sogenannten Compiler gelesen, in Objekt-Dateien umgewandelt und schließlich von einer .elf-Datei zu einer .img Datei gemacht werden.
 Zusätzlich muss man allerdings beachten, dass diese .img-Datei dann später auch an erster Stelle (Also an der Addresse: 0x80000) der SD-Karte stehen muss, da das [BIOS](https://de.wikipedia.org/wiki/BIOS) (Basic Input/Output System) dort beim Starten des Computers nach einer solchen Datei sucht und diese anfängt auszuführen. Nun kommt ein sogenanntes [Linkscript](https://www.gnu.org/software/binutils/) ins Spiel, dessen Job es ist, genau das in die Tat umzusetzen.
-Da ich Programmierer bin, und meine Aufgabe es ist, solche Dinge zu automatisieren, habe ich das natürlich getan. Wie habe ich das getan? - Mit einem Makefile
+Da ich Programmierer bin, und meine Aufgabe es ist, solche Dinge zu automatisieren, habe ich das natürlich getan. Wie habe ich das getan? - Mit einem *Makefile*
 
 ```
 ARMGNU ?= aarch64-linux-gnu
@@ -72,6 +72,17 @@ kernel8.img: $(SRC_DIR)/linker.ld $(OBJ_FILES)
 	$(ARMGNU)-ld -T $(SRC_DIR)/linker.ld -o $(BUILD_DIR)/kernel8.elf $(OBJ_FILES)
 	$(ARMGNU)-objcopy $(BUILD_DIR)/kernel8.elf -O binary kernel8.img
 ```
+
+Keine Sorge! Sie müssen diesen Code nicht verstehen, denn alles was er tut, ist die .img-Datei mit zwei simplen Befehlen zu erstellen, bzw. zu löschen
+
+```
+make
+
+make clean
+```
+
+Bin ich jetzt endlich fertig? - Ja, fast. Nun muss man nur noch die .img-Datei auf die SD-Karte spielen, den Raspberry Pi über die verschiedenen Pins verbinden, Strom anlegen und es funktioniert! In dem PuTTY-Fenster auf der Dev-Machine kann man nun Dinge in die Konsole eingeben! 
+
 
 
 Hilfreiche Ressourcen:
