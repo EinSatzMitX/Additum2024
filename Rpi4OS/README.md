@@ -31,7 +31,9 @@ Der Kernel ist praktisch das Herzstück eines jeden OS‘ .  Auf ihm basiert das
 
 Zu Beginn meines Projekts habe ich lediglich einen Kernel in [C](https://en.wikipedia.org/wiki/C_(programming_language)) geschrieben, der darauf wartet, dass der User eine Taste drückt und dann den entsprechenden Buchstaben wiedergibt.
 Diesen C-Code kann ich allerdings nicht einfach auf meine SD-Karte laden und hoffen, dass alles klappt, das wäre ja viel zu einfach. Zu erst muss dieser Code in eine .img-Datei kompiliert werden, d.h. er muss von einem sogenannten Compiler gelesen, in Objekt-Dateien umgewandelt und schließlich von einer .elf-Datei zu einer .img Datei gemacht werden.
-Zusätzlich muss man allerdings beachten, dass diese .img-Datei dann später auch an erster Stelle der SD-Karte steht, da das [BIOS](https://de.wikipedia.org/wiki/BIOS) (Basic Input/Output System) dort beim Starten des Computers nach einer solchen Datei sucht und diese anfängt auszuführen. Nun kommt ein sogenanntes Linkscript ins Spiel, dessen Job es ist, das in die Tat umzusetzen
+Zusätzlich muss man allerdings beachten, dass diese .img-Datei dann später auch an erster Stelle (Also an der Addresse: 0x80000) der SD-Karte stehen muss, da das [BIOS](https://de.wikipedia.org/wiki/BIOS) (Basic Input/Output System) dort beim Starten des Computers nach einer solchen Datei sucht und diese anfängt auszuführen. Nun kommt ein sogenanntes [Linkscript](https://www.gnu.org/software/binutils/) ins Spiel, dessen Job es ist, genau das in die Tat umzusetzen.
+Da ich Programmierer bin, und meine Aufgabe es ist, solche Dinge zu automatisieren, habe ich das natürlich getan. Wie habe ich das getan? - Mit einem [Makefile](/Rpi4OS/Makefile)
+
 
 Hilfreiche Ressourcen:
 ---
