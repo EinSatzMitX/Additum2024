@@ -1,7 +1,8 @@
+#include "io.h"
+
 // GPIO
 
 enum {
-    PERIPHERAL_BASE = 0xFE000000,
     GPFSEL0         = PERIPHERAL_BASE + 0x200000,
     GPSET0          = PERIPHERAL_BASE + 0x20001C,
     GPCLR0          = PERIPHERAL_BASE + 0x200028,

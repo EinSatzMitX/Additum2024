@@ -1,1 +1,1 @@
-build/io_c.o: src/io.c
+build/io_c.o: src/io.c include/io.h

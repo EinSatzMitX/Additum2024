@@ -1,1 +1,1 @@
-build/kernel_c.o: src/kernel.c include/io.h
+build/kernel_c.o: src/kernel.c include/io.h include/fb.h
