@@ -155,9 +155,8 @@ void drawScoreboard(int score, int lives)
     drawChar((char)lives + 0x30, (WIDTH/2)-252 + (8*20*3), MARGIN-25, 0x0f, 3);
 }
 
-void main()
-{
-    struct Object *foundObject;
+void breakoutGame(){
+        struct Object *foundObject;
     unsigned char ch = 0;
 
     int lives = NUM_LIVES;
@@ -230,5 +229,11 @@ void main()
     if (bricks == 0) drawString((WIDTH/2)-(strwidth/2), (HEIGHT/2)-(strheight/2), "Well done!", 0x02, zoom);
     else drawString((WIDTH/2)-(strwidth/2), (HEIGHT/2)-(strheight/2), "Game over!", 0x04, zoom);
 
-    while (1);
+}
+
+
+void main()
+{
+    breakoutGame();
+    
 }
