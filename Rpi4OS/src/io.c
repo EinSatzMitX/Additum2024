@@ -164,3 +164,48 @@ void uart_update() {
        if (ch == '\r') uart_writeText("\n"); else uart_writeByteBlocking(ch);
     }
 }
+//
+//
+//
+//
+//
+
+int findestHighestValue(char ch[], int size){
+    int highestValue = -1;
+    for (int i =0; i < size; i++){
+        if (ch[i] == 0x00)
+        {
+            highestValue = i - 1;
+            break;
+        }
+        else{
+
+        }
+    }
+    return highestValue;
+}
+
+char inputString[256];
+
+void uart_detectInput(){
+    uart_loadOutputFifo();
+
+    if(uart_isReadByteReady()){
+        unsigned char ch = uart_readByte();
+        int highestIndexWithValue = findestHighestValue(inputString, 256);
+
+
+        while (highestIndexWithValue != 256)
+        {
+            if(ch == '\r' || ch == 0) {
+                uart_writeText("\n");
+                break;
+            } 
+            else {
+                uart_writeByteBlocking(ch);
+                inputString[256] = ch;
+            }
+        }
+        
+    }
+}
