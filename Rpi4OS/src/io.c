@@ -1,4 +1,5 @@
 #include "io.h"
+#include "fb.h"
 
 // GPIO
 
@@ -162,5 +163,15 @@ void uart_update() {
     if (uart_isReadByteReady()) {
        unsigned char ch = uart_readByte();
        if (ch == '\r') uart_writeText("\n"); else uart_writeByteBlocking(ch);
+    }
+}
+
+
+void updateTerminalInput(int x, int y, unsigned char attr, int zoom){
+    uart_loadOutputFifo();
+
+    if (uart_isReadByteReady()) {
+       unsigned char ch = uart_readByte();
+       if (ch == '\r' || ch == ' ') drawChar('\n', x, y, attr, zoom); else drawChar(ch, x, y, attr, zoom);
     }
 }

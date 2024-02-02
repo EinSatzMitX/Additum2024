@@ -236,10 +236,10 @@ void main()
 
     wait_msec(0x1000);
 
-    drawString((WIDTH/2)-(strwidth/2), (HEIGHT/2)-(strheight/2), "test", 0x02, zoom);
+    drawString((WIDTH/2)-(strwidth/2), (HEIGHT/2)-(strheight/2), "Test", 0x04, zoom);
 
     wait_msec(0x1000);
+    clearScreen();
 
-    while (1) clearScreen();
-    
+    while(1) updateTerminalInput(0, 0, 0x15, zoom); ;
 }
