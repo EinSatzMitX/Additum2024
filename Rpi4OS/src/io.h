@@ -10,5 +10,3 @@ void uart_writeByteBlocking(unsigned char ch);
 void uart_update();
 void mmio_write(long reg, unsigned int val);
 unsigned int mmio_read(long reg);
-extern char inputString[256];
-void uart_detectInput();
