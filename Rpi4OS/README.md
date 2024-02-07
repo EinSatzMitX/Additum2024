@@ -35,42 +35,26 @@ Zusätzlich muss man allerdings beachten, dass diese .img-Datei dann später auc
 Da ich Programmierer bin, und meine Aufgabe es ist, solche Dinge zu automatisieren, habe ich das natürlich getan. Wie habe ich das getan? - Mit einem *Makefile*
 
 ```
-ARMGNU ?= aarch64-linux-gnu
+CFILES = $(wildcard *.c)
+OFILES = $(CFILES:.c=.o)
+GCCFLAGS = -Wall -O1 -ffreestanding -nostdinc -nostdlib -nostartfiles
+GCCPATH ?= aarch64-linux-gnu
 
-COPS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -nostartfiles
+all: clean kernel8.img
 
-ASMOPS = -Iinclude
+boot.o: boot.S
+	$(GCCPATH)-gcc $(GCCFLAGS) -c boot.S -o boot.o
 
-BUILD_DIR = build
-SRC_DIR = src
+%.o: %.c
+	$(GCCPATH)-gcc $(GCCFLAGS) -c $< -o $@
 
-all : kernel8.img
 
-clean :
-	rm -rf $(BUILD_DIR) *.img 
+kernel8.img: boot.o $(OFILES)
+	$(GCCPATH)-ld -nostdlib boot.o $(OFILES) -T linker.ld -o kernel8.elf
+	$(GCCPATH)-objcopy -O binary kernel8.elf kernel8.img
+
+clean:
 	/bin/rm kernel8.elf *.o *.img > /dev/null 2> /dev/null || true
-
-$(BUILD_DIR)/%_c.o: $(SRC_DIR)/%.c
-	mkdir -p $(@D)
-	$(ARMGNU)-gcc $(COPS) -MMD -c $< -o $@
-
-$(BUILD_DIR)/%_s.o: $(SRC_DIR)/%.S
-	mkdir -p $(@D)
-	$(ARMGNU)-gcc $(COPS) -MMD -c $< -o $@
-
-C_FILES = $(wildcard $(SRC_DIR)/*.c)
-ASM_FILES = $(wildcard $(SRC_DIR)/*.S)
-OBJ_FILES = $(C_FILES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%_c.o)
-OBJ_FILES += $(ASM_FILES:$(SRC_DIR)/%.S=$(BUILD_DIR)/%_s.o)
-
-DEP_FILES = $(OBJ_FILES:%.o=%.d)
--include $(DEP_FILES)
-
-kernel8.img: $(SRC_DIR)/linker.ld $(OBJ_FILES)
-	@echo "Building for RPI $(value RPI_VERSION)"
-	@echo ""
-	$(ARMGNU)-ld -T $(SRC_DIR)/linker.ld -o $(BUILD_DIR)/kernel8.elf $(OBJ_FILES)
-	$(ARMGNU)-objcopy $(BUILD_DIR)/kernel8.elf -O binary kernel8.img
 ```
 
 Keine Sorge! Sie müssen diesen Code nicht verstehen, denn alles was er tut, ist die .img-Datei mit zwei simplen Befehlen zu erstellen, bzw. zu löschen
