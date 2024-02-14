@@ -70,9 +70,10 @@ make clean
 Bin ich jetzt endlich fertig? - Naja, fast. Nun muss man nur noch die kernel8.img-Datei auf die SD-Karte spielen, den Raspberry Pi über die verschiedenen Pins verbinden, Strom anlegen und es funktioniert! In dem PuTTY-Fenster auf der Dev-Machine kann man nun Dinge in die Konsole eingeben! 
 
 Das wäre allerdings ein ziemlich langweiliges Projekt und schon fast zu wenig Aufwand, daher habe ich mich direkt dazu entschieden C zu lernen und das Spiel "breakout" zu programmieren. Auch wenn das Original im Jahr 1976 entstanden ist, ist es noch lange nicht veraltet und eine gute Übungsaufgabe, um meine neu erworbenen C-Kenntnisse anzuwenden. Zudem muss ich mich mit der HDMI-Übertragung des RPis auseinandersetzen und einen eigenen framebuffer schreiben.
+Wenn nun auch das getan ist, kann ich nun erneut die .img-Datei auf meine SD-Karte übertragen, meinen RPi an den Bildschirm, meinen PC und das Netzteil andschließen und es läuft! Ein funktionierendes Spiel, das mit Hilfe der Tasten 'h' und 'l' gesteuert werden kann!
 
 
-![cabled RPi](/Rpi4OS/documenttion/cabled-pins.jpg)
+![cabled RPi](/Rpi4OS/documentation/images/cabled_pins.jpg) ![breakout Game](/Rpi4OS/documentation/images/breakout_Game.jpg)
 
 
 
