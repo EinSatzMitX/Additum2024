@@ -73,7 +73,7 @@ Das wäre allerdings ein ziemlich langweiliges Projekt und schon fast zu wenig A
 Wenn nun auch das getan ist, kann ich nun erneut die .img-Datei auf meine SD-Karte übertragen, meinen RPi an den Bildschirm, meinen PC und das Netzteil andschließen und es läuft! Ein funktionierendes Spiel, das mit Hilfe der Tasten 'h' und 'l' gesteuert werden kann!
 
 
-![cabled RPi](/Rpi4OS/documentation/images/cabled_pins.jpg) ![breakout Game](/Rpi4OS/documentation/images/breakout_Game.jpg)
+![cabled RPi](/Rpi4OS/documentation/cabled_pins.jpg) ![breakout Game](/Rpi4OS/documentation/breakout_Game.jpg)
 
 
 
