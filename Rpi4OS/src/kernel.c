@@ -15,5 +15,7 @@ void main()
     initBreakout();
     clearScreen();
     
-    while(1) updateTerminalInput(0, 0, 0x15, 5); ;
+    while(1) {
+        updateTerminalInput(0, 0, 0x15, 5);
+    }
 }

@@ -10,4 +10,6 @@ void uart_writeByteBlocking(unsigned char ch);
 void uart_update();
 void mmio_write(long reg, unsigned int val);
 unsigned int mmio_read(long reg);
+extern unsigned char TerminalInput[256];
+unsigned int findHighestIndex(unsigned char* array, unsigned int size);
 void updateTerminalInput(int x, int y, unsigned char attr, int zoom);

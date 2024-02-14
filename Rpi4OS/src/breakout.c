@@ -172,6 +172,7 @@ void initBreakout(){
     unsigned char ch = 0;
 
     int lives = NUM_LIVES;
+    
     int points = 0;
     
     int velocity_x = 1;

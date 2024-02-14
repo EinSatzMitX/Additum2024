@@ -166,12 +166,36 @@ void uart_update() {
     }
 }
 
+unsigned char TerminalInput[256];
+
+unsigned int findHighestIndex(unsigned char* array, unsigned int size) {
+    unsigned int highestIndex = 0;
+
+    // Start from the end of the array and move towards the beginning
+    for (int i = 0; i < size; i++) {
+        if (array[i] != 0) {
+            highestIndex = i;
+            break;  // Break out of the loop as soon as a non-zero value is found
+        }
+    }
+
+    return highestIndex;
+}
+
 
 void updateTerminalInput(int x, int y, unsigned char attr, int zoom){
     uart_loadOutputFifo();
 
     if (uart_isReadByteReady()) {
        unsigned char ch = uart_readByte();
-       if (ch == '\r' || ch == ' ') drawChar('\n', x, y, attr, zoom); else drawChar(ch, x, y, attr, zoom);
+       if (ch == '\r'){
+            drawChar('\n', x, y, attr, zoom);
+        }  
+        else{
+            unsigned int size = sizeof(TerminalInput) / sizeof(TerminalInput[0]);
+            int highestIndex = findHighestIndex(TerminalInput, size);
+            if (!uart_isOutputQueueEmpty())TerminalInput[highestIndex] = ch;
+            drawChar(ch, x + highestIndex*zoom, y, attr, zoom);
+        }
     }
 }
