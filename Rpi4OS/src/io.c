@@ -107,7 +107,7 @@ void uart_init() {
     mmio_write(AUX_MU_MCR_REG, 0);
     mmio_write(AUX_MU_IER_REG, 0);
     mmio_write(AUX_MU_IIR_REG, 0xC6); //disable interrupts
-    mmio_write(AUX_MU_BAUD_REG, AUX_MU_BAUD(115200));
+    mmio_write(AUX_MU_BAUD_REG, AUX_MU_BAUD(9600));
     gpio_useAsAlt5(14);
     gpio_useAsAlt5(15);
     mmio_write(AUX_MU_CNTL_REG, 3); //enable RX/TX
