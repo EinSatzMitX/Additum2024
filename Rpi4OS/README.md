@@ -1,7 +1,7 @@
 Additum 2023/2024
 ===
 
-In meinem Additum für diese Jahr habe ich mich dafür entschieden verschiedene Projekte mit meinem Raspberry Pi 4B (kurz: RPi) zu behandeln.
+In meinem Additum für dieses Jahr habe ich mich dafür entschieden verschiedene Projekte mit meinem Raspberry Pi 4B (kurz: RPi) zu behandeln.
 Allerdings hat mich ein bestimmtes Projekt besonders fasziniert: Ein eigenen Kernel für das Betriebssystem (auch genannt: OS) meines RPi‘s schreiben.
 
 Dafür benötigte Hardware:
@@ -17,6 +17,7 @@ Dafür Benötigte Software:
 - Code-Editor(en) (ich habe mich für VSCode & Vim entschieden)
 - ["AArch64 ELF bare-metal target“](https://developer.arm.com/-/media/Files/downloads/gnu-a/10.2-2020.11/binrel/gcc-arm-10.2-2020.11-aarch64-aarch64-none-elf.tar.xz) (Cross-Compiler,um den C-Code auf der Dev-Machine, die auf einem x86_64 Processor läuft für den RPi, der auf einem ARM-Processor läuft zu Compilen)
 - ["Gnu Make"](https://www.gnu.org/software/make/) (wird später im Detail erläutert)
+- ["Gnu binutils"](https://www.gnu.org/software/binutils/)
 - [PuTTY](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html) (Programm, um die Dev-Machine mittels UART-Protocol mit dem Rpi zu verbinden und sich somit das Leben um einiges zu erleichtern)
 - [Driver für das USB-SerialTTL-Kabel](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
 
@@ -24,56 +25,41 @@ Vorgehen & Funktionsweise:
 ---
 
 Da ich das komplette Vorgehen auf keinen Fall unter 15 Seiten protokollieren kann, werde ich hier die gröbsten Vorgehensweisen für mein Projekt auflisten.
-Nachdem die Benötigte Software installiert wurde, kann ich nun endlich das Fundament für den sogenannten „kernel“ zu schreiben.
+Nachdem die Benötigte Software installiert wurde, kann ich nun endlich das Fundament für den sogenannten „Kernel“ zu schreiben.
 Der Kernel ist praktisch das Herzstück eines jeden OS‘ .  Auf ihm basiert das ganz OS, dazu zählen alle Programme, Shells und noch vieles mehr.
 
 ![Kernel schematic](https://1.bp.blogspot.com/-X1N_xwpDxmw/V7M1eIzPuUI/AAAAAAAABC0/vktEVckQDKAdN0o305OrHEDzH2TmCkLgQCPcB/s200/PowerShell.JPG)
 
 Zu Beginn meines Projekts habe ich lediglich einen Kernel in [C](https://en.wikipedia.org/wiki/C_(programming_language)) geschrieben, der darauf wartet, dass der User eine Taste drückt und dann den entsprechenden Buchstaben wiedergibt.
-Diesen C-Code kann ich allerdings nicht einfach auf meine SD-Karte laden und hoffen, dass alles klappt, das wäre ja viel zu einfach. Zu erst muss dieser Code in eine .img-Datei kompiliert werden, d.h. er muss von einem sogenannten Compiler gelesen, in Objekt-Dateien umgewandelt und schließlich von einer .elf-Datei zu einer .img Datei gemacht werden.
+Das ist jedoch einfacher gesagt, als getan, denn ich muss meinem Kernel zuerst einmal beibringen, was "UART" ist, d.h. Ich muss einen sogenannten ["Driver"](https://de.wikipedia.org/wiki/Gerätetreiber) schreiben, der dem RPi sagt, wie er Signale empfangen, interpretieren und senden kann. Wenn dies nun nach harter Arbeit und (und wirklich, wirklich vieler) Recherche gelingt, bin ich schon einen ganzen Schritt weiter. 
+Den geschriebenen C-Code kann ich allerdings nicht einfach auf meine SD-Karte laden und hoffen, dass alles klappt, das wäre ja viel zu einfach. Zu erst muss dieser Code in eine .img-Datei kompiliert werden, d.h. er muss von einem sogenannten Compiler gelesen, in Objekt-Dateien (Dateinendung: *.o) umgewandelt und schließlich von einer .elf-Datei zu einer .img Datei gemacht werden.
 Zusätzlich muss man allerdings beachten, dass diese .img-Datei dann später auch an erster Stelle (Also an der Addresse: 0x80000) der SD-Karte stehen muss, da das [BIOS](https://de.wikipedia.org/wiki/BIOS) (Basic Input/Output System) dort beim Starten des Computers nach einer solchen Datei sucht und diese anfängt auszuführen. Nun kommt ein sogenanntes [Linkscript](https://www.gnu.org/software/binutils/) ins Spiel, dessen Job es ist, genau das in die Tat umzusetzen.
 Da ich Programmierer bin, und meine Aufgabe es ist, solche Dinge zu automatisieren, habe ich das natürlich getan. Wie habe ich das getan? - Mit einem *Makefile*
 
 ```
-ARMGNU ?= aarch64-linux-gnu
+CFILES = $(wildcard *.c)
+OFILES = $(CFILES:.c=.o)
+GCCFLAGS = -Wall -O1 -ffreestanding -nostdinc -nostdlib -nostartfiles
+GCCPATH ?= aarch64-linux-gnu
 
-COPS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -nostartfiles
+all: clean kernel8.img
 
-ASMOPS = -Iinclude
+boot.o: boot.S
+	$(GCCPATH)-gcc $(GCCFLAGS) -c boot.S -o boot.o
 
-BUILD_DIR = build
-SRC_DIR = src
+%.o: %.c
+	$(GCCPATH)-gcc $(GCCFLAGS) -c $< -o $@
 
-all : kernel8.img
 
-clean :
-	rm -rf $(BUILD_DIR) *.img 
+kernel8.img: boot.o $(OFILES)
+	$(GCCPATH)-ld -nostdlib boot.o $(OFILES) -T linker.ld -o kernel8.elf
+	$(GCCPATH)-objcopy -O binary kernel8.elf kernel8.img
+
+clean:
 	/bin/rm kernel8.elf *.o *.img > /dev/null 2> /dev/null || true
-
-$(BUILD_DIR)/%_c.o: $(SRC_DIR)/%.c
-	mkdir -p $(@D)
-	$(ARMGNU)-gcc $(COPS) -MMD -c $< -o $@
-
-$(BUILD_DIR)/%_s.o: $(SRC_DIR)/%.S
-	mkdir -p $(@D)
-	$(ARMGNU)-gcc $(COPS) -MMD -c $< -o $@
-
-C_FILES = $(wildcard $(SRC_DIR)/*.c)
-ASM_FILES = $(wildcard $(SRC_DIR)/*.S)
-OBJ_FILES = $(C_FILES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%_c.o)
-OBJ_FILES += $(ASM_FILES:$(SRC_DIR)/%.S=$(BUILD_DIR)/%_s.o)
-
-DEP_FILES = $(OBJ_FILES:%.o=%.d)
--include $(DEP_FILES)
-
-kernel8.img: $(SRC_DIR)/linker.ld $(OBJ_FILES)
-	@echo "Building for RPI $(value RPI_VERSION)"
-	@echo ""
-	$(ARMGNU)-ld -T $(SRC_DIR)/linker.ld -o $(BUILD_DIR)/kernel8.elf $(OBJ_FILES)
-	$(ARMGNU)-objcopy $(BUILD_DIR)/kernel8.elf -O binary kernel8.img
 ```
 
-Keine Sorge! Sie müssen diesen Code nicht verstehen, denn alles was er tut, ist die .img-Datei mit zwei simplen Befehlen zu erstellen, bzw. zu löschen
+Keine Sorge! Sie müssen diesen 'Code' nicht verstehen, denn alles was er tut, ist die .img-Datei mit zwei simplen Befehlen zu erstellen, bzw. zu löschen
 
 ```
 make
@@ -81,14 +67,18 @@ make
 make clean
 ```
 
-Bin ich jetzt endlich fertig? - Ja, fast. Nun muss man nur noch die .img-Datei auf die SD-Karte spielen, den Raspberry Pi über die verschiedenen Pins verbinden, Strom anlegen und es funktioniert! In dem PuTTY-Fenster auf der Dev-Machine kann man nun Dinge in die Konsole eingeben! 
+Bin ich jetzt endlich fertig? - Naja, fast. Nun muss man nur noch die kernel8.img-Datei auf die SD-Karte spielen, den Raspberry Pi über die verschiedenen Pins verbinden, Strom anlegen und es funktioniert! In dem PuTTY-Fenster auf der Dev-Machine kann man nun Dinge in die Konsole eingeben! 
 
-![cabled RPi](/Rpi4OS/documenttion/cabled-pins.jpg)
+Das wäre allerdings ein ziemlich langweiliges Projekt und schon fast zu wenig Aufwand, daher habe ich mich direkt dazu entschieden C zu lernen und das Spiel "breakout" zu programmieren. Auch wenn das Original im Jahr 1976 entstanden ist, ist es noch lange nicht veraltet und eine gute Übungsaufgabe, um meine neu erworbenen C-Kenntnisse anzuwenden. Zudem muss ich mich mit der HDMI-Übertragung des RPis auseinandersetzen und einen eigenen framebuffer schreiben.
+Wenn nun auch das getan ist, kann ich nun erneut die .img-Datei auf meine SD-Karte übertragen, meinen RPi an den Bildschirm, meinen PC und das Netzteil andschließen und es läuft! Ein funktionierendes Spiel, das mit Hilfe der Tasten 'h' und 'l' gesteuert werden kann!
+
+
+![cabled RPi](/Rpi4OS/documentation/cabled_pins.jpg)
+![breakout Game](/Rpi4OS/documentation/breakout_Game.jpg)
 
 
 
 
 Hilfreiche Ressourcen:
 ---
-[Github](https://github.com/babbleberry/rpi4-osdev)
-[test image](https://1.bp.blogspot.com/-X1N_xwpDxmw/V7M1eIzPuUI/AAAAAAAABC0/vktEVckQDKAdN0o305OrHEDzH2TmCkLgQCPcB/s200/PowerShell.JPG)
+[Raspberry Pi datasheets](https://datasheets.raspberrypi.com)
