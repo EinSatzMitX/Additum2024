@@ -1,5 +1,5 @@
-#include "fb.h"
-#include "io.h"
+#include "../include/fb.h"
+#include "../include/io.h"
 
 // The screen
 #define WIDTH         1920
@@ -55,7 +55,7 @@ void moveObject(struct Object *object, int xoff, int yoff)
 
 struct Object *detectCollision(struct Object *with, int xoff, int yoff)
 {
-    for (int i=0; i<numobjs;i++) {
+   for (int i=0; i<numobjs;i++) {
 	if (&objects[i] != with && objects[i].alive == 1) {
 	   if (with->x + xoff > objects[i].x + objects[i].width || objects[i].x > with->x + xoff + with->width) {
               // with is too far left or right to ocllide
@@ -177,9 +177,6 @@ void initBreakout(){
     
     int velocity_x = 1;
     int velocity_y = 3;
-
-    uart_init();
-    fb_init();
 
     initBricks();
     initBall();

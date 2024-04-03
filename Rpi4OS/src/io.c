@@ -1,5 +1,5 @@
-#include "io.h"
-#include "fb.h"
+#include "../include/io.h"
+#include "../include/fb.h"
 
 // GPIO
 
