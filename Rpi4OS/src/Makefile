@@ -1,6 +1,6 @@
 CFILES = $(wildcard *.c)
 OFILES = $(CFILES:.c=.o)
-GCCFLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -nostartfiles
+GCCFLAGS = -Wall -O1 -ffreestanding -nostdinc -nostdlib -nostartfiles
 GCCPATH ?= aarch64-linux-gnu
 
 all: clean kernel8.img

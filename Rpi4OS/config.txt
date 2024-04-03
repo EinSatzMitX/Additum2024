@@ -1,2 +1,6 @@
-arm_64bit=1
 core_freq_min=500
+hdmi_group=1
+hdmi_mode=16
+
+#this only works with a baud rate that isnt equal to 112500?!
+arm_64bit=1
