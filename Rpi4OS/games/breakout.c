@@ -71,7 +71,7 @@ struct Object *detectCollision(struct Object *with, int xoff, int yoff)
 }
 
 // KEY HANDLER
-
+/*
 unsigned char getUart()
 {
     unsigned char ch = 0;
@@ -79,7 +79,7 @@ unsigned char getUart()
     if (uart_isReadByteReady()) ch = uart_readByte();
     return ch;
 }
-
+*/
 // OBJECT INITIALISERS
 
 void initBricks()

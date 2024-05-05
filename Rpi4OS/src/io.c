@@ -199,3 +199,11 @@ void updateTerminalInput(int x, int y, unsigned char attr, int zoom){
         }
     }
 }
+
+unsigned char getUart()
+{
+    unsigned char ch = 0;
+
+    if (uart_isReadByteReady()) ch = uart_readByte();
+    return ch;
+}

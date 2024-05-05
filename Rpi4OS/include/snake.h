@@ -1,2 +1,2 @@
 
-void init_snake();
+void init_snake_Game();
