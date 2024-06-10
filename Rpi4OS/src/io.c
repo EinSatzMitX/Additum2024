@@ -1,5 +1,6 @@
 #include "../include/io.h"
 #include "../include/fb.h"
+#include "../include/commands.h"
 
 // GPIO
 
@@ -166,38 +167,86 @@ void uart_update() {
     }
 }
 
-unsigned char TerminalInput[256];
+struct Terminal
+{
+    unsigned char Input[256]; // This number is completely made up and doesn't serve any purpose, feel free to change whenever it's needed
+    int maxIndex;
+    int currentX;
+    int currentY;
+    int zoom;
+};
 
-unsigned int findHighestIndex(unsigned char* array, unsigned int size) {
-    unsigned int highestIndex = 0;
+struct Terminal Terminal;
 
-    // Start from the end of the array and move towards the beginning
-    for (int i = 0; i < size; i++) {
-        if (array[i] != 0) {
-            highestIndex = i;
-            break;  // Break out of the loop as soon as a non-zero value is found
-        }
+void uart_clear_Terminal_Queue(){
+    for (int i = 0; i < Terminal.maxIndex; i++){
+        Terminal.Input[i] = 0;
     }
-
-    return highestIndex;
 }
 
+void uart_reset_Terminal(){
+    uart_clear_Terminal_Queue();
+    Terminal.maxIndex = 0;
+    Terminal.currentX = 0;
+    Terminal.currentY = 0;
+    Terminal.zoom = 2;
 
-void updateTerminalInput(int x, int y, unsigned char attr, int zoom){
-    uart_loadOutputFifo();
+    // vvv Actual Footage of me being an absolute moron vvv
+    //Terminal.zoom = 0;
+}
+
+void init_uart_Terminal(int width, int height)
+{
+
+}
+
+void uart_update_Terminal(int width, int height){
+    int pressed_Enter = 0;
+    while (!pressed_Enter)
+    {
+            uart_loadOutputFifo();
 
     if (uart_isReadByteReady()) {
-       unsigned char ch = uart_readByte();
-       if (ch == '\r'){
-            drawChar('\n', x, y, attr, zoom);
-        }  
+        unsigned char ch = uart_readByte();
+        if (ch == '\r'){
+            drawChar('\n', Terminal.currentX, Terminal.currentY, 2, Terminal.zoom);
+            Terminal.maxIndex++;
+            Terminal.currentY += (Terminal.zoom * 8);
+            Terminal.currentX = 0;
+            pressed_Enter = 1;
+            break;
+        }
+        else if (ch != 0){
+            drawChar(ch, Terminal.currentX, Terminal.currentY, 2, Terminal.zoom);
+            Terminal.maxIndex++;
+            Terminal.currentX += (Terminal.zoom * 8);
+        }
+        else if ((Terminal.currentX + Terminal.zoom*8) >= width && (Terminal.currentY + Terminal.zoom * 8) < height)
+        {
+            Terminal.currentX = 0;
+            Terminal.currentY += (Terminal.zoom * 8);
+        }
+        else if ((Terminal.currentY + Terminal.zoom*8) >= height && (Terminal.currentX + Terminal.zoom * 8) < width)
+        {
+            Terminal.currentY = 0;
+            Terminal.currentX += (Terminal.zoom * 8);
+        }
         else{
-            unsigned int size = sizeof(TerminalInput) / sizeof(TerminalInput[0]);
-            int highestIndex = findHighestIndex(TerminalInput, size);
-            if (!uart_isOutputQueueEmpty())TerminalInput[highestIndex] = ch;
-            drawChar(ch, x + highestIndex*zoom, y, attr, zoom);
+            ;
         }
     }
+    }
+
+    check_command(Terminal.Input);
+}
+
+void uart_read_Terminal_Input(unsigned char* buffer){
+
+    for (int i = 0; i < Terminal.maxIndex;i++){
+        buffer[i] = Terminal.Input[i];
+
+    }
+    buffer[255] = '\0';
 }
 
 unsigned char getUart()
