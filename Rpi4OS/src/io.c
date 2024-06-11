@@ -182,11 +182,11 @@ void uart_clear_Terminal_Queue(){
     for (int i = 0; i < Terminal.maxIndex; i++){
         Terminal.Input[i] = 0;
     }
+    Terminal.maxIndex = 0;
 }
 
 void uart_reset_Terminal(){
     uart_clear_Terminal_Queue();
-    Terminal.maxIndex = 0;
     Terminal.currentX = 0;
     Terminal.currentY = 0;
     Terminal.zoom = 2;
@@ -200,6 +200,11 @@ void init_uart_Terminal(int width, int height)
 
 }
 
+void uart_add_char_to_Terminal_Input(char c){
+    Terminal.Input[Terminal.maxIndex] = c;
+    Terminal.maxIndex++;
+}
+
 void uart_update_Terminal(int width, int height){
     int pressed_Enter = 0;
     while (!pressed_Enter)
@@ -210,7 +215,11 @@ void uart_update_Terminal(int width, int height){
         unsigned char ch = uart_readByte();
         if (ch == '\r'){
             drawChar('\n', Terminal.currentX, Terminal.currentY, 2, Terminal.zoom);
+
+            //Add the letter to the Terminal Input. This line of code is important and you shouldn't forget something as necessary as this...
+            Terminal.Input[Terminal.maxIndex] = '\n';
             Terminal.maxIndex++;
+            
             Terminal.currentY += (Terminal.zoom * 8);
             Terminal.currentX = 0;
             pressed_Enter = 1;
@@ -218,6 +227,7 @@ void uart_update_Terminal(int width, int height){
         }
         else if (ch != 0){
             drawChar(ch, Terminal.currentX, Terminal.currentY, 2, Terminal.zoom);
+            Terminal.Input[Terminal.maxIndex] = ch;
             Terminal.maxIndex++;
             Terminal.currentX += (Terminal.zoom * 8);
         }
@@ -237,7 +247,17 @@ void uart_update_Terminal(int width, int height){
     }
     }
 
+    if (Terminal.maxIndex < 20){
+        drawString(1600, 16, (char *) Terminal.Input, 5, 2);
+    }
+    else{
+        for (int i = 0; i < 20; i++){
+            drawChar(Terminal.Input[i], (1600 + (16 * i)), 16, 5, 2);
+        }
+    }
+
     check_command(Terminal.Input);
+    uart_clear_Terminal_Queue();
 }
 
 void uart_read_Terminal_Input(unsigned char* buffer){

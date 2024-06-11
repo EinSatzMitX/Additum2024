@@ -7,9 +7,9 @@ void clearString(unsigned char *buffer, int size){
    }
 }
 
-void trim_string_at_space(unsigned char *buffer){
+void trim_string_at_newLine(unsigned char *buffer){
     for (int i = 0; buffer[i] != '\0'; i++) {
-        if (buffer[i] == ' ') {
+        if (buffer[i] == '\n') {
             buffer[i] = '\0';
             break;
         }
@@ -25,9 +25,9 @@ int compareStrings(const unsigned char *str1, const unsigned char *str2) {
 }
 
 // Function to copy a string from src to dest
-void strcpy_custom(unsigned char *dest, const char *src) {
+void strcpy_custom(char *dest, const char *src) {
     while (*src) {
-        *dest++ = (unsigned char) *src++;
+        *dest++ = *src++;
     }
     *dest = '\0';  // Null-terminate the string
 }

@@ -16,6 +16,7 @@ void uart_reset_Terminal();
 // unsigned int findHighestIndex(unsigned char* array, unsigned int size);
 // void updateTerminalInput(int x, int y, unsigned char attr, int zoom);
 void init_uart_Terminal(int width, int height);
+void uart_add_char_to_Terminal_Input(char c);
 void uart_update_Terminal(int width, int height);
 void uart_read_Terminal_Input(unsigned char *buffer);
 unsigned char getUart();

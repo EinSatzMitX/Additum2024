@@ -11,7 +11,6 @@
 // For the bricks
 #define ROWS          5
 #define COLS          10
-unsigned int bricks = ROWS * COLS;
 
 // Gameplay
 #define NUM_LIVES     3
@@ -172,7 +171,8 @@ void initBreakout(){
     unsigned char ch = 0;
 
     int lives = NUM_LIVES;
-    
+    unsigned int bricks = ROWS * COLS;
+
     int points = 0;
     
     int velocity_x = 1;
@@ -237,6 +237,8 @@ void initBreakout(){
     int strheight = FONT_BPG * zoom;
 
     if (bricks == 0) drawString((WIDTH/2)-(strwidth/2), (HEIGHT/2)-(strheight/2), "Well done!", 0x02, zoom);
-    else drawString((WIDTH/2)-(strwidth/2), (HEIGHT/2)-(strheight/2), "Game over!", 0x04, zoom);
-
+    else{
+        drawString((WIDTH/2)-(strwidth/2), (HEIGHT/2)-(strheight/2), "Game over!", 0x04, zoom);
+        clearScreen();
+    }
 }
