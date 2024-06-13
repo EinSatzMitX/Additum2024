@@ -2,7 +2,7 @@
 #include "../include/io.h"
 //#include "../include/snake.h"
 #include "../include/breakout.h"
-#include "../include/bsp.h"
+//#include "../include/bsp.h"
 #include "../include/math.h"
 #include "../include/util.h"
 #include "../include/commands.h"
@@ -11,6 +11,8 @@ void main()
 {
     uart_init();
     fb_init();
+    init_Commands();
+
 
     // I don't think I'll have to explain what this does :)
     drawString(0, 0, "@@@@@@@@                                                                @@@@@@@@\n", 1, 1);
@@ -67,7 +69,6 @@ void main()
 
 
     // Terminal section
-    init_Commands();
 
     uart_reset_Terminal();
     while(1){

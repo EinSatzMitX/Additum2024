@@ -15,6 +15,7 @@ Command Commands[10];
 void init_Commands(){
    strcpy_custom(Commands[0].Command, "clear\0");
    strcpy_custom(Commands[1].Command, "breakout\0");
+   strcpy_custom(Commands[2].Command, "help\0");
 }
 
 void cmd_clear(){
@@ -24,6 +25,11 @@ void cmd_clear(){
 
 void cmd_breakout(){
    initBreakout();
+}
+
+void cmd_help(){
+   char s[256] = "List of Commands\0";
+   uart_write_to_Terminal((unsigned char*)s, 2);
 }
 
 void check_command(unsigned char *command){
@@ -43,6 +49,12 @@ void check_command(unsigned char *command){
    else if(compareStrings(command, Commands[1].Command) == 0){
       cmd_clear();
       initBreakout();
+   }
+   //
+   // HELP
+   //
+   else if(compareStrings(command, Commands[2].Command) == 0){
+      cmd_help();
    }
    //
    // No valid Command

@@ -1,2 +1,2 @@
 
-void init_bsp();
+//void init_bsp();

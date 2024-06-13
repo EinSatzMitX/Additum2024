@@ -1,3 +1,4 @@
+/*
 #include "../include/bsp.h"
 #include "../include/fb.h"
 #include "../include/math.h"
@@ -57,12 +58,12 @@ void move_player(){
         P.y -= dy;
     }
     // move up, move down, look up, look down
-    /*
+    
     if (getUart() == 'a' && getUart() == 'm') 
     if (getUart() == 'd' && getUart() == 'm') 
     if (getUart() == 'w' && getUart() == 'm') 
     if (getUart() == 's' && getUart() == 'm') 
-    */
+    
 }
 
 void draw_3D(){
@@ -129,3 +130,4 @@ void init_bsp()
         drawChar('d', 10, 10, 5, 3);
     }
 }
+*/

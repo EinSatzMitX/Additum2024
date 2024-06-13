@@ -22,4 +22,4 @@ kernel8.img: $(OFILES)
 	$(OBJCOPY) -O binary kernel8.elf kernel8.img
 
 clean:
-	/bin/rm kernel8.elf */*.o *.img > /dev/null 2> /dev/null || true
+	/bin/rm -rf kernel8.elf */*.o *.img || true

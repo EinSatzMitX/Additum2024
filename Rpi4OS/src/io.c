@@ -170,7 +170,7 @@ void uart_update() {
 struct Terminal
 {
     unsigned char Input[256]; // This number is completely made up and doesn't serve any purpose, feel free to change whenever it's needed
-    int maxIndex;
+    int currentIndex;
     int currentX;
     int currentY;
     int zoom;
@@ -179,10 +179,10 @@ struct Terminal
 struct Terminal Terminal;
 
 void uart_clear_Terminal_Queue(){
-    for (int i = 0; i < Terminal.maxIndex; i++){
+    for (int i = 0; i < Terminal.currentIndex; i++){
         Terminal.Input[i] = 0;
     }
-    Terminal.maxIndex = 0;
+    Terminal.currentIndex = 0;
 }
 
 void uart_reset_Terminal(){
@@ -195,14 +195,9 @@ void uart_reset_Terminal(){
     //Terminal.zoom = 0;
 }
 
-void init_uart_Terminal(int width, int height)
-{
-
-}
-
 void uart_add_char_to_Terminal_Input(char c){
-    Terminal.Input[Terminal.maxIndex] = c;
-    Terminal.maxIndex++;
+    Terminal.Input[Terminal.currentIndex] = c;
+    Terminal.currentIndex++;
 }
 
 void uart_update_Terminal(int width, int height){
@@ -217,19 +212,46 @@ void uart_update_Terminal(int width, int height){
             drawChar('\n', Terminal.currentX, Terminal.currentY, 2, Terminal.zoom);
 
             //Add the letter to the Terminal Input. This line of code is important and you shouldn't forget something as necessary as this...
-            Terminal.Input[Terminal.maxIndex] = '\n';
-            Terminal.maxIndex++;
+            Terminal.Input[Terminal.currentIndex] = '\n';
+            Terminal.currentIndex++;
             
             Terminal.currentY += (Terminal.zoom * 8);
             Terminal.currentX = 0;
             pressed_Enter = 1;
             break;
         }
+        else if(ch == 0b01111111){
+
+            /* Input logic (works) */
+            if (Terminal.currentIndex - 1 >= 0) {
+                Terminal.Input[Terminal.currentIndex] = 0; 
+                Terminal.currentIndex -= 1;
+            }
+
+            Terminal.currentX -= (Terminal.zoom * 8);
+
+            /*if (Terminal.currentX + (Terminal.zoom * 8) >= width)  {
+                Terminal.currentX = 0;
+            }
+            else if ((Terminal.currentX - 8 * Terminal.zoom) <= 0){
+                Terminal.currentX = width;
+                Terminal.currentY += (8 * Terminal.zoom);
+            }*/
+
+
+            /* Draw logic */
+            drawChar(' ', Terminal.currentX, Terminal.currentY, 2, Terminal.zoom);
+        }
         else if (ch != 0){
             drawChar(ch, Terminal.currentX, Terminal.currentY, 2, Terminal.zoom);
-            Terminal.Input[Terminal.maxIndex] = ch;
-            Terminal.maxIndex++;
+            Terminal.Input[Terminal.currentIndex] = ch;
+            Terminal.currentIndex++;
+
             Terminal.currentX += (Terminal.zoom * 8);
+            if((Terminal.currentX + 8 * Terminal.zoom) > width){
+                Terminal.currentX = 0;
+                Terminal.currentY += (8 * Terminal.zoom);
+            }
         }
         else if ((Terminal.currentX + Terminal.zoom*8) >= width && (Terminal.currentY + Terminal.zoom * 8) < height)
         {
@@ -247,7 +269,9 @@ void uart_update_Terminal(int width, int height){
     }
     }
 
-    if (Terminal.maxIndex < 20){
+    drawRect(1600, 16, width, 32, 0, 16);
+
+    if (Terminal.currentIndex < 20){
         drawString(1600, 16, (char *) Terminal.Input, 5, 2);
     }
     else{
@@ -262,11 +286,32 @@ void uart_update_Terminal(int width, int height){
 
 void uart_read_Terminal_Input(unsigned char* buffer){
 
-    for (int i = 0; i < Terminal.maxIndex;i++){
+    for (int i = 0; i < Terminal.currentIndex;i++){
         buffer[i] = Terminal.Input[i];
 
     }
     buffer[255] = '\0';
+}
+
+void uart_write_to_Terminal(unsigned char* s, unsigned char attr){
+    while (*s)
+    {
+        if(*s == '\n'){
+            Terminal.currentX = 0;
+            Terminal.currentY += (8 * Terminal.zoom);
+        }
+        else if(Terminal.currentX + (8 * Terminal.zoom) > 1920){
+            Terminal.currentX = 0;
+            Terminal.currentY += (8 * Terminal.zoom);
+        }
+        else{
+            Terminal.currentX += (8 * Terminal.zoom);
+        }
+
+        drawChar('a', Terminal.currentX, Terminal.currentY, 2, Terminal.zoom);
+        drawChar(*s, Terminal.currentX, Terminal.currentY, attr, Terminal.zoom);
+        s++;
+    }
 }
 
 unsigned char getUart()
