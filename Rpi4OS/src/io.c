@@ -293,10 +293,24 @@ void uart_read_Terminal_Input(unsigned char* buffer){
     buffer[255] = '\0';
 }
 
+void uart_write_newLine_to_Terminal(){
+    Terminal.currentX = 0;
+    Terminal.currentY += (8 * Terminal.zoom);
+}
+
 void uart_write_to_Terminal(unsigned char* s, unsigned char attr){
+    int rainbow_mode = 0;
+    if (attr == RAINBOW_MODE){
+        rainbow_mode = 1;
+        attr = 0;
+    }
+    else{
+        rainbow_mode = 0;
+    }
+
     while (*s)
     {
-        if(*s == '\n'){
+        if(*s == '\n' || *s == '\r'){
             Terminal.currentX = 0;
             Terminal.currentY += (8 * Terminal.zoom);
         }
@@ -308,7 +322,15 @@ void uart_write_to_Terminal(unsigned char* s, unsigned char attr){
             Terminal.currentX += (8 * Terminal.zoom);
         }
 
-        drawChar('a', Terminal.currentX, Terminal.currentY, 2, Terminal.zoom);
+
+        // Do we want some beautiful colors?
+        if (rainbow_mode == 1 && attr == 8){
+            attr = 1;
+        }
+        else if (rainbow_mode == 1 && *s != ' '){
+            attr++;
+        }
+        
         drawChar(*s, Terminal.currentX, Terminal.currentY, attr, Terminal.zoom);
         s++;
     }

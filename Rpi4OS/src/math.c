@@ -45,3 +45,20 @@ double cosine(double x) {
 double tangent(double x) {
     return sine(x) / cosine(x);
 }
+
+// Static seed variable
+static unsigned int seed = 1;
+
+unsigned int lcg_rand() {
+    // Constants for the LCG
+    const unsigned int a = 1103515245;
+    const unsigned int c = 12345;
+    const unsigned int m = 0x7FFFFFFF; // 2^31-1
+
+    seed = (a * seed + c) % m;
+    return seed;
+}
+
+void lcg_srand(unsigned int new_seed) {
+    seed = new_seed;
+}

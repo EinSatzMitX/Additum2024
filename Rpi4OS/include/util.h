@@ -2,6 +2,7 @@
 void clearString(unsigned char *buffer, int size);
 
 void trim_string_at_newLine(unsigned char *buffer);
+void trim_string_at_newLine(unsigned char *buffer);
 
 //If the strings are equal, it returns 0.
 //If str1 is less than str2, it returns a negative value.

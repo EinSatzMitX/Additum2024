@@ -76,7 +76,7 @@ void drawRect(int x1, int y1, int x2, int y2, unsigned char attr, int fill)
        int x=x1;
        while (x <= x2) {
 	  if ((x == x1 || x == x2) || (y == y1 || y == y2)) drawPixel(x, y, attr);
-	  else if (fill) drawPixel(x, y, (attr & 0xf0) >> 4);
+	  else if (fill == 1) drawPixel(x, y, (attr & 0xf0) >> 4);
           x++;
        }
        y++;
@@ -113,7 +113,7 @@ void drawCircle(int x0, int y0, int radius, unsigned char attr, int fill)
     int err = 0;
  
     while (x >= y) {
-	if (fill) {
+	if (fill == 1) {
 	   drawLine(x0 - y, y0 + x, x0 + y, y0 + x, (attr & 0xf0) >> 4);
 	   drawLine(x0 - x, y0 + y, x0 + x, y0 + y, (attr & 0xf0) >> 4);
 	   drawLine(x0 - x, y0 - y, x0 + x, y0 - y, (attr & 0xf0) >> 4);

@@ -1,3 +1,4 @@
+
 unsigned int vgapal[] = {
     0x000000,
     0x0000AA,

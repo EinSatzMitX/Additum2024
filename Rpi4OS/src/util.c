@@ -16,6 +16,15 @@ void trim_string_at_newLine(unsigned char *buffer){
     }
 }
 
+void trim_string_at_space(unsigned char *buffer){
+    for (int i = 0; buffer[i] != '\0'; i++) {
+        if (buffer[i] == ' ') {
+            buffer[i] = '\0';
+            break;
+        }
+    }
+}
+
 int compareStrings(const unsigned char *str1, const unsigned char *str2) {
     while (*str1 && (*str1 == *str2)) {
         str1++;
