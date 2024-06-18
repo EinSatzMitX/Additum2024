@@ -34,6 +34,30 @@ Zu Beginn meines Projekts habe ich lediglich einen Kernel in [C](https://en.wiki
 Das ist jedoch einfacher gesagt, als getan, denn ich muss meinem Kernel zuerst einmal beibringen, was "UART" ist, d.h. Ich muss einen sogenannten ["Driver"](https://de.wikipedia.org/wiki/Gerätetreiber) schreiben, der dem RPi sagt, wie er Signale empfangen, interpretieren und senden kann. Wenn dies nun nach harter Arbeit und (und wirklich, wirklich vieler) Recherche gelingt, bin ich schon einen ganzen Schritt weiter. 
 Den geschriebenen C-Code kann ich allerdings nicht einfach auf meine SD-Karte laden und hoffen, dass alles klappt, das wäre ja viel zu einfach. Zu erst muss dieser Code in eine .img-Datei kompiliert werden, d.h. er muss von einem sogenannten Compiler gelesen, in Objekt-Dateien (Dateinendung: *.o) umgewandelt und schließlich von einer .elf-Datei zu einer .img Datei gemacht werden.
 Zusätzlich muss man allerdings beachten, dass diese .img-Datei dann später auch an der Adresse 0x80000 im Arbeitsspeicher stehen muss, da die Firmware des RPi (ähnlich wie das [BIOS](https://de.wikipedia.org/wiki/BIOS) (Basic Input/Output System) oder das modernere [UEFI](https://www.computerweekly.com/de/definition/UEFI-Unified-Extensible-Firmware-Interface#:~:text=Unified%20Extensible%20Firmware%20Interface%20(UEFI)%20ist%20ein%20Softwareprogramm%2C%20das,seinem%20Betriebssystem%20(OS)%20verbindet.) (Unified Extensible Firmware Interface) auf anderen Computern) dort beim Starten des Computers versucht den Programmcode zu laden. Nun kommt ein sogenanntes [Linkscript](https://www.gnu.org/software/binutils/) ins Spiel, dessen Job es ist, genau das in die Tat umzusetzen.
+
+```
+SECTIONS
+{
+    . = 0x80000;     /* Kernel load address for AArch64 */
+    .text : { KEEP(*(.text.boot)) *(.text .text.* .gnu.linkonce.t*) }
+    .rodata : { *(.rodata .rodata.* .gnu.linkonce.r*) }
+    PROVIDE(_data = .);
+    .data : { *(.data .data.* .gnu.linkonce.d*) }
+    .bss (NOLOAD) : {
+        . = ALIGN(16);
+        __bss_start = .;
+        *(.bss .bss.*)
+        *(COMMON)
+        __bss_end = .;
+    }
+    _end = .;
+
+   /DISCARD/ : { *(.comment) *(.gnu*) *(.note*) *(.eh_frame*) }
+}
+__bss_size = (__bss_end - __bss_start)>>3;
+```
+
+
 Da ich Programmierer bin, und meine Aufgabe es ist, solche Dinge zu automatisieren, habe ich das natürlich getan. Wie habe ich das getan? - Mit einem *[Makefile](https://www.sis.pitt.edu/mbsclass/tutorial/advanced/makefile/whatis.htm)*
 
 ```
