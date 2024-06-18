@@ -2,7 +2,7 @@ Additum 2023/2024
 ===
 
 In meinem Additum für dieses Jahr habe ich mich dafür entschieden verschiedene Projekte mit meinem Raspberry Pi 4B (kurz: RPi) zu behandeln.
-Allerdings hat mich ein bestimmtes Projekt besonders fasziniert: Ein eigenen Kernel für das Betriebssystem (auch genannt: OS) meines RPi‘s schreiben.
+Allerdings hat mich ein bestimmtes Projekt besonders fasziniert: Ein eigenescBetriebssystem (auch genannt: OS) für meinen RPi zu schreiben.
 
 Dafür benötigte Hardware:
 ---
@@ -33,7 +33,7 @@ Der Kernel ist praktisch das Herzstück eines jeden OS‘ .  Auf ihm basiert das
 Zu Beginn meines Projekts habe ich lediglich einen Kernel in [C](https://en.wikipedia.org/wiki/C_(programming_language)) geschrieben, der darauf wartet, dass der User eine Taste drückt und dann den entsprechenden Buchstaben wiedergibt.
 Das ist jedoch einfacher gesagt, als getan, denn ich muss meinem Kernel zuerst einmal beibringen, was "UART" ist, d.h. Ich muss einen sogenannten ["Driver"](https://de.wikipedia.org/wiki/Gerätetreiber) schreiben, der dem RPi sagt, wie er Signale empfangen, interpretieren und senden kann. Wenn dies nun nach harter Arbeit und (und wirklich, wirklich vieler) Recherche gelingt, bin ich schon einen ganzen Schritt weiter. 
 Den geschriebenen C-Code kann ich allerdings nicht einfach auf meine SD-Karte laden und hoffen, dass alles klappt, das wäre ja viel zu einfach. Zu erst muss dieser Code in eine .img-Datei kompiliert werden, d.h. er muss von einem sogenannten Compiler gelesen, in Objekt-Dateien (Dateinendung: *.o) umgewandelt und schließlich von einer .elf-Datei zu einer .img Datei gemacht werden.
-Zusätzlich muss man allerdings beachten, dass diese .img-Datei dann später auch an erster Stelle (Also an der Addresse: 0x80000) der SD-Karte stehen muss, da die Firmware des RPi (ähnlich wie das [BIOS](https://de.wikipedia.org/wiki/BIOS) (Basic Input/Output System) oder das modernere [UEFI](https://www.computerweekly.com/de/definition/UEFI-Unified-Extensible-Firmware-Interface#:~:text=Unified%20Extensible%20Firmware%20Interface%20(UEFI)%20ist%20ein%20Softwareprogramm%2C%20das,seinem%20Betriebssystem%20(OS)%20verbindet.) (Unified Extensible Firmware Interface) auf anderen Computern) dort beim Starten des Computers nach einer solchen Datei sucht und diese anfängt auszuführen. Nun kommt ein sogenanntes [Linkscript](https://www.gnu.org/software/binutils/) ins Spiel, dessen Job es ist, genau das in die Tat umzusetzen.
+Zusätzlich muss man allerdings beachten, dass diese .img-Datei dann später auch an der Adresse 0x80000 im Arbeitsspeicher stehen muss, da die Firmware des RPi (ähnlich wie das [BIOS](https://de.wikipedia.org/wiki/BIOS) (Basic Input/Output System) oder das modernere [UEFI](https://www.computerweekly.com/de/definition/UEFI-Unified-Extensible-Firmware-Interface#:~:text=Unified%20Extensible%20Firmware%20Interface%20(UEFI)%20ist%20ein%20Softwareprogramm%2C%20das,seinem%20Betriebssystem%20(OS)%20verbindet.) (Unified Extensible Firmware Interface) auf anderen Computern) dort beim Starten des Computers versucht den Programmcode zu laden. Nun kommt ein sogenanntes [Linkscript](https://www.gnu.org/software/binutils/) ins Spiel, dessen Job es ist, genau das in die Tat umzusetzen.
 Da ich Programmierer bin, und meine Aufgabe es ist, solche Dinge zu automatisieren, habe ich das natürlich getan. Wie habe ich das getan? - Mit einem *[Makefile](https://www.sis.pitt.edu/mbsclass/tutorial/advanced/makefile/whatis.htm)*
 
 ```
@@ -86,13 +86,7 @@ Was ich bisher erreicht habe
 	- Dazu noch eine I/O-System, das Dateien über UART versenden kann
 	- Ebenso der Framebuffer, der ganze Bilder, nicht nur einzelne Pixel beschreiben kann
 - Mit den gegebenen Ressourcen ein HelloWorld-Programm und schließlich auch ein ganzes Spiel erstellt
-
-
-Was ich dieses Jahr noch erreichen will
----
-
-- Ein weiteres Spiel Programmieren
-- Eine Art Terminal erstellen, über das ich Befehle ausführen kann, wie z.B. die verschiedenen Spiele starten
+- Von PuTTY auf einen Arduino umgestiegen, sodass ich kein anderes Gerät (außer eine Tastatur) brauche
 
 
 Was ich dieses Jahr gelernt habe
